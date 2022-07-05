@@ -2,12 +2,15 @@ import express from "express";
 import bodyParser from "body-parser";
 import cors from "cors";
 import axios from "axios";
+import { findUserInfo } from "./firebase.js";
+import { makeToken } from "./jwt.js";
+import jwt from "jsonwebtoken";
 
 const app = express();
 
 const corsOption = {
   origin: "http://localhost:3000",
-  Credential: true,
+  credentials: true,
 };
 
 app.use(bodyParser.urlencoded({ extended: true }));
@@ -22,7 +25,9 @@ app.post("/oAuth/kakao", async (req, res) => {
   try {
     const { access_token } = req.body;
 
-    const result = await axios({
+    const {
+      data: { kakao_account },
+    } = await axios({
       url: "https://kapi.kakao.com/v2/user/me",
       method: "get",
       params: {
@@ -34,7 +39,22 @@ app.post("/oAuth/kakao", async (req, res) => {
       },
     });
 
-    console.log(result);
+    const result = await findUserInfo(kakao_account.email);
+
+    const token = await makeToken(kakao_account.email);
+
+    // 회원이 있는 경우
+    if (result) {
+      res.cookie("jwt_Token", token, {
+        httpOnly: true,
+        maxAge: 1000000,
+      });
+      res.send({
+        result: true,
+      });
+    } else {
+      res.send({ result: false });
+    }
   } catch (e) {
     console.log(e);
   }
