@@ -25,17 +25,22 @@ const userRef = collection(db, "user");
 export const findUserInfo = async (email) => {
   try {
     let userCollectionID = null;
+    let userData = null;
+
     const q = query(userRef, where("email", "==", email));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
+      console.log(doc);
       userCollectionID = doc.id;
+      userData = doc.data();
     });
+    console.log(userData);
 
     if (userCollectionID) {
-      return true;
+      return userData;
     }
 
-    return false;
+    return userData;
   } catch (e) {
     console.log(e);
   }
