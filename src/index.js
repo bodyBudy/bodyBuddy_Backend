@@ -21,7 +21,7 @@ app.use(cookieParser());
 
 app.get("/verify", async (req, res) => {
   try {
-    const token = req.cookies.jwt_Token;
+    const token = req.query.token;
     const decodeResult = verifyToken(token);
     const user = await findUserInfo(decodeResult);
 
