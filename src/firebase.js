@@ -30,11 +30,10 @@ export const findUserInfo = async (email) => {
     const q = query(userRef, where("email", "==", email));
     const querySnapshot = await getDocs(q);
     querySnapshot.forEach((doc) => {
-      console.log(doc);
       userCollectionID = doc.id;
       userData = doc.data();
     });
-    console.log(userData);
+    // console.log(userData);
 
     if (userCollectionID) {
       return userData;
